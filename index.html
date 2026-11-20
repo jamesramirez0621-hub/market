@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7f2">
+  <title>Grocery Calculator</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: #23332b;
+      background: #f5f7f2;
+      font-synthesis: none;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 48px 20px;
+      background:
+        radial-gradient(ellipse at 12% 0%, #e5efdc 0, transparent 38%),
+        #f5f7f2;
+    }
+
+    main {
+      width: min(100%, 760px);
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: #56805d;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 6vw, 3rem);
+      letter-spacing: -0.045em;
+    }
+
+    header p:last-child {
+      margin: 10px 0 0;
+      color: #65756a;
+    }
+
+    .panel {
+      margin-bottom: 20px;
+      padding: 24px;
+      border: 1px solid #e4e9e1;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 12px 36px #263b2910;
+    }
+
+    h2 {
+      margin: 0 0 16px;
+      font-size: 1.15rem;
+    }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .products li {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 16px;
+      border: 1px solid #e8ede6;
+      border-radius: 12px;
+      background: #fbfcfa;
+    }
+
+    .products strong {
+      color: #3e7048;
+      white-space: nowrap;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 120px auto;
+      align-items: end;
+      gap: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      color: #4f5f53;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      min-height: 46px;
+      padding: 10px 12px;
+      border: 1px solid #d6dfd4;
+      border-radius: 10px;
+      color: inherit;
+      background: white;
+      font: inherit;
+    }
+
+    input:focus {
+      border-color: #56805d;
+      outline: 3px solid #56805d28;
+    }
+
+    button {
+      min-height: 46px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 10px;
+      color: white;
+      background: #3f7049;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #315d3a;
+    }
+
+    .message {
+      min-height: 1.25em;
+      margin: 12px 0 0;
+      color: #a13d33;
+      font-size: 0.9rem;
+    }
+
+    .cart-header,
+    .cart-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 76px 95px 40px;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .cart-header {
+      padding: 0 12px 10px;
+      color: #78847b;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .cart-row {
+      min-height: 54px;
+      padding: 8px 12px;
+      border-top: 1px solid #edf0eb;
+    }
+
+    .cart-row span:nth-child(2),
+    .cart-row span:nth-child(3),
+    .cart-header span:nth-child(2),
+    .cart-header span:nth-child(3) {
+      text-align: right;
+    }
+
+    .remove-button {
+      min-height: 34px;
+      padding: 0;
+      color: #68766b;
+      background: transparent;
+      font-size: 1.2rem;
+    }
+
+    .remove-button:hover {
+      color: #a13d33;
+      background: #fff1ef;
+    }
+
+    .empty {
+      margin: 12px;
+      color: #78847b;
+    }
+
+    .total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 2px solid #e8ede6;
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .clear-button {
+      min-height: 38px;
+      padding: 0 12px;
+      color: #a13d33;
+      background: #fff1ef;
+      font-size: 0.88rem;
+    }
+
+    .clear-button:hover:not(:disabled) {
+      color: white;
+      background: #a13d33;
+    }
+
+    .clear-button:disabled {
+      color: #78847b;
+      background: #edf0eb;
+      cursor: not-allowed;
+    }
+
+    .profit-calendar {
+      margin-top: 28px;
+    }
+
+    .calendar-description {
+      margin: -6px 0 18px;
+      color: #65756a;
+      font-size: 0.92rem;
+    }
+
+    .month-navigation {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .month-navigation h3 {
+      margin: 0;
+      text-align: center;
+    }
+
+    .month-navigation button {
+      min-width: 44px;
+      min-height: 40px;
+      padding: 0 12px;
+    }
+
+    .month-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .month-summary > div {
+      display: grid;
+      gap: 6px;
+      padding: 12px;
+      border: 1px solid #e8ede6;
+      border-radius: 12px;
+      background: #fbfcfa;
+    }
+
+    .month-summary span {
+      color: #65756a;
+      font-size: 0.8rem;
+    }
+
+    .month-summary strong {
+      font-size: clamp(0.95rem, 3vw, 1.15rem);
+      overflow-wrap: anywhere;
+    }
+
+    .month-summary .profit-positive {
+      color: #3e7048;
+    }
+
+    .month-summary .profit-negative {
+      color: #a13d33;
+    }
+
+    .weekday-row,
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .weekday-row {
+      margin-bottom: 6px;
+    }
+
+    .weekday-row span {
+      padding: 6px 0;
+      color: #78847b;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .calendar-day,
+    .calendar-blank {
+      min-width: 0;
+      min-height: 74px;
+      padding: 8px 6px;
+      border: 1px solid #e8ede6;
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    .calendar-day {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: space-between;
+      color: #23332b;
+      text-align: left;
+    }
+
+    .calendar-day:hover {
+      border-color: #9cba9f;
+      background: #f3f8f1;
+    }
+
+    .calendar-day.selected {
+      border-color: #3f7049;
+      outline: 2px solid #3f7049;
+    }
+
+    .calendar-day.today .day-number {
+      color: #3f7049;
+      font-weight: 800;
+    }
+
+    .day-number {
+      font-size: 0.86rem;
+    }
+
+    .day-profit {
+      width: 100%;
+      overflow: hidden;
+      color: #3e7048;
+      font-size: 0.68rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .day-profit.profit-negative {
+      color: #a13d33;
+    }
+
+    .calendar-blank {
+      border-color: transparent;
+      background: transparent;
+    }
+
+    .day-editor {
+      margin-top: 22px;
+      padding-top: 20px;
+      border-top: 1px solid #e8ede6;
+    }
+
+    .day-editor h3 {
+      margin: 0 0 14px;
+      font-size: 1rem;
+    }
+
+    #daily-entry-form {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .entry-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      grid-column: 1 / -1;
+    }
+
+    .entry-actions .clear-button {
+      border: 1px solid #f1d8d5;
+    }
+
+    @media (max-width: 560px) {
+      body {
+        padding: 28px 14px;
+      }
+
+      .panel {
+        padding: 19px;
+      }
+
+      form {
+        grid-template-columns: 1fr 100px;
+      }
+
+      form button {
+        grid-column: 1 / -1;
+      }
+
+      .cart-header,
+      .cart-row {
+        grid-template-columns: minmax(0, 1fr) 48px 80px 30px;
+        gap: 6px;
+        padding-right: 4px;
+        padding-left: 4px;
+      }
+
+      .month-summary {
+        gap: 6px;
+      }
+
+      .month-summary > div {
+        padding: 9px 7px;
+      }
+
+      .calendar-day,
+      .calendar-blank {
+        min-height: 58px;
+        padding: 6px 3px;
+      }
+
+      .day-profit {
+        font-size: 0.58rem;
+      }
+
+      .weekday-row span {
+        font-size: 0.68rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">Shopping list</p>
+      <h1>Grocery Calculator</h1>
+      <p>Pick items, enter quantities, and keep track of your total.</p>
+    </header>
+
+    <section class="panel" aria-labelledby="available-heading">
+      <h2 id="available-heading">Available items</h2>
+      <ul class="products" id="products"></ul>
+    </section>
+
+    <section class="panel" aria-labelledby="add-heading">
+      <h2 id="add-heading">Add to your list</h2>
+      <form id="item-form">
+        <label for="item-choice">
+          Item number or name
+          <input id="item-choice" name="item" type="text" list="item-suggestions"
+                 placeholder="For example: 1 or Milk" autocomplete="off" required>
+          <datalist id="item-suggestions"></datalist>
+        </label>
+        <label for="quantity">
+          Quantity
+          <input id="quantity" name="quantity" type="number" min="1" step="1"
+                 value="1" required>
+        </label>
+        <button type="submit">Add item</button>
+      </form>
+      <p class="message" id="message" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="panel" aria-labelledby="list-heading">
+      <h2 id="list-heading">Your items</h2>
+      <div class="cart-header" aria-hidden="true">
+        <span>Item</span><span>Qty</span><span>Price</span><span></span>
+      </div>
+      <div id="cart"></div>
+      <div class="total">
+        <span>Total: <span id="total">$0.00</span></span>
+        <button class="clear-button" id="clear-button" type="button" disabled>Clear items</button>
+      </div>
+    </section>
+
+    <section class="panel profit-calendar" aria-labelledby="profit-heading">
+      <h2 id="profit-heading">Monthly profit calendar</h2>
+      <p class="calendar-description">Enter each day's revenue and costs. Your totals are saved in this browser, and the last saved day opens again when you return.</p>
+
+      <div class="month-navigation">
+        <button id="previous-month" type="button" aria-label="Previous month">&larr;</button>
+        <h3 id="month-label"></h3>
+        <button id="next-month" type="button" aria-label="Next month">&rarr;</button>
+      </div>
+
+      <div class="month-summary" aria-label="Monthly totals">
+        <div><span>Revenue</span><strong id="monthly-revenue">$0.00</strong></div>
+        <div><span>Costs</span><strong id="monthly-costs">$0.00</strong></div>
+        <div><span>Profit</span><strong id="monthly-profit">$0.00</strong></div>
+      </div>
+
+      <div class="weekday-row" aria-hidden="true">
+        <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span>
+        <span>Thu</span><span>Fri</span><span>Sat</span>
+      </div>
+      <div class="calendar-grid" id="calendar-grid" aria-label="Calendar days"></div>
+
+      <div class="day-editor">
+        <h3 id="selected-date-label">Daily revenue and costs</h3>
+        <form id="daily-entry-form">
+          <label for="daily-revenue">
+            Revenue
+            <input id="daily-revenue" type="number" min="0" step="0.01" placeholder="0.00" required>
+          </label>
+          <label for="daily-costs">
+            Costs
+            <input id="daily-costs" type="number" min="0" step="0.01" placeholder="0.00" required>
+          </label>
+          <div class="entry-actions">
+            <button type="submit">Save day</button>
+            <button class="clear-button" id="delete-day" type="button" disabled>Delete day entry</button>
+          </div>
+        </form>
+        <p class="message" id="profit-message" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const products = [
+      { name: "Wow ulam afritada", price: 27 },
+      { name: "cdo meat loaf", price: 25 },
+      { name: "lucky 7 carne norte 150g", price: 25 },
+      { name: "lucky 7 carne norte 100g", price: 22 },
+      { name: "atami green ", price: 26 },
+      { name: "cdo karne norte guisado 150g", price: 35 },
+      { name: "century flakes and oil budjet size 125g", price: 37 },
+      { name: "lucky 7 green 155g", price: 23 },
+      { name: "master sardines green 155g", price: 28 },
+      { name: "coco mama fresh gata 200ml", price: 38 },
+      { name: "nissing ramen spicy hot beef 62g", price: 17 },
+      { name: "nissin ramen beef 55g", price: 13 },
+      { name: "nissin ramen seafood 55g", price: 17 },
+      { name: "homi beef brisket 55g", price: 12 },
+      { name: "lucky me beef 55g", price: 12 },
+      { name: "lucky me chicken 55g", price: 12 },
+      { name: "lucky me canton extra hot 75g", price: 17 },
+      { name: "lucky me canton calamansi 80g", price: 17 },
+      { name: "payless canton extra kal 128g", price: 22 },
+      { name: "nissin ramen CKN 55g", price: 13 },
+      { name: "lucky me canton chilimansi 80g", price: 17 },
+      { name: "hansel choco", price: 8 },
+      { name: "rebisco choco", price: 8 },
+      { name: "rebisco craker", price: 8 },
+      { name: "cream peanut", price: 8 },
+      { name: "fita cracker", price: 8 },
+      { name: "hansel craker", price: 8 },
+      { name: "knor sinigang sampalok", price: 10 },
+      { name: "knor cubes pork", price: 8 },
+      { name: "knor cubes chicken", price: 8 },
+      { name: "coffee mate 5g", price: 3 },
+      { name: "kopiko brown coffee twin pack", price: 15 },
+      { name: "top cafe  palm sugar", price: 17 },
+      { name: "kopoko blanka twin pack 40g", price: 15 },
+      { name: "ajinomoto blue 11g", price: 6 },
+      { name: "bear brand swak", price: 14 },
+      { name: "birch tree fortified 33g", price: 13 },
+      { name: "milo ", price: 12 },
+      { name: "ajinomoto red", price: 32 },
+      { name: "fudgee bar choco", price: 10 },
+      { name: "cream silk pink", price: 8 },
+      { name: "cream silk green", price: 8 },
+      { name: "surf powder rose fresh ac rose fresh", price: 8 },
+      { name: "tide powder garden bloom", price: 18 },
+      { name: "surf powder sunfresh", price: 8 },
+      { name: "sunsilk shampoo smooth&manageable", price: 8 },
+      { name: "hapee red sulit sachet", price: 15 },
+      { name: "downy antibac 26ml", price: 9 },
+      { name: "downy antibac fab con 41ml", price: 13 },
+      { name: "#sotanghon", price: 12 },
+      { name: "colgate cool menthol", price: 12 },
+      { name: "ariel powder", price: 18 },
+      { name: "champion todo tipid pack", price: 17 },
+      { name: "silka papaya soap orange", price: 22 },
+      { name: "championfabcon atibac", price: 8 },
+      { name: "clear shampoo men", price: 8 },
+      { name: "downy garder bloom fabcon", price: 9 },
+      { name: "colgate spicy fresh", price: 12 },
+      { name: "cripy fry breading mix", price: 23 },
+      { name: "champion bar supra powder original", price: 9 },
+      { name: "biodern coolness", price: 22 },
+      { name: "scotch vrite scrubbing", price: 19 },
+      { name: "dove shampoo biokrtin", price: 8 },
+      { name: "palmolive shampoo", price: 8 },
+      { name: "wawang sun universe mosquito coil", price: 24 },
+      { name: "heartex tissue", price: 8 },
+      { name: "palmolive shampoo intensive moist", price: 8 },
+      { name: "shure plastic ice", price: 30 },
+      { name: "happy cotton 10g", price: 8 },
+      { name: "surf fabcon blossom fresh", price: 8 },
+      { name: "green cross alcohol", price: 99 },
+      { name: "sanicare cotton", price: 15 },
+      { name: "casino ethyl alcohol", price: 27 },
+      { name: "brown sugar", price: 20 },
+    ];
+    const cart = [];
+    const productList = document.getElementById("products");
+    const suggestions = document.getElementById("item-suggestions");
+    const cartContainer = document.getElementById("cart");
+    const totalDisplay = document.getElementById("total");
+    const message = document.getElementById("message");
+    const clearButton = document.getElementById("clear-button");
+
+    function formatMoney(amount) {
+      return "$" + amount.toFixed(2);
+    }
+
+    function renderProducts() {
+      products.forEach((product, index) => {
+        const row = document.createElement("li");
+        const name = document.createElement("span");
+        const price = document.createElement("strong");
+        name.textContent = `${index + 1}. ${product.name}`;
+        price.textContent = `${formatMoney(product.price)} each`;
+        row.append(name, price);
+        productList.append(row);
+
+        const option = document.createElement("option");
+        option.value = product.name;
+        suggestions.append(option);
+      });
+    }
+
+    function renderCart() {
+      cartContainer.replaceChildren();
+
+      if (cart.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "empty";
+        empty.textContent = "Your list is empty. Add an item above to get started.";
+        cartContainer.append(empty);
+      }
+
+      let total = 0;
+      cart.forEach((item, index) => {
+        const row = document.createElement("div");
+        row.className = "cart-row";
+
+        const name = document.createElement("span");
+        name.textContent = item.name;
+        const quantity = document.createElement("span");
+        quantity.textContent = item.quantity;
+        const price = document.createElement("span");
+        const itemTotal = item.price * item.quantity;
+        price.textContent = formatMoney(itemTotal);
+        total += itemTotal;
+
+        const remove = document.createElement("button");
+        remove.className = "remove-button";
+        remove.type = "button";
+        remove.textContent = "\u00d7";
+        remove.setAttribute("aria-label", `Remove ${item.name}`);
+        remove.addEventListener("click", () => {
+          cart.splice(index, 1);
+          renderCart();
+        });
+
+        row.append(name, quantity, price, remove);
+        cartContainer.append(row);
+      });
+
+      totalDisplay.textContent = formatMoney(total);
+      clearButton.disabled = cart.length === 0;
+    }
+
+    clearButton.addEventListener("click", () => {
+      cart.length = 0;
+      message.textContent = "";
+      renderCart();
+    });
+
+    document.getElementById("item-form").addEventListener("submit", (event) => {
+      event.preventDefault();
+      message.textContent = "";
+
+      const choice = document.getElementById("item-choice").value.trim();
+      const quantity = Number(document.getElementById("quantity").value);
+      const numericChoice = Number(choice);
+      const product = Number.isInteger(numericChoice) && numericChoice > 0
+        ? products[numericChoice - 1]
+        : products.find((item) => item.name.toLowerCase() === choice.toLowerCase());
+
+      if (!product) {
+        message.textContent = "Choose an item number or name from the available list.";
+        return;
+      }
+      if (!Number.isInteger(quantity) || quantity < 1) {
+        message.textContent = "Quantity must be a whole number greater than zero.";
+        return;
+      }
+
+      cart.push({ name: product.name, price: product.price, quantity });
+      document.getElementById("item-choice").value = "";
+      document.getElementById("quantity").value = "1";
+      renderCart();
+      document.getElementById("item-choice").focus();
+    });
+
+    renderProducts();
+    renderCart();
+
+    const profitStorageKey = "grocery-calculator-daily-profit-v1";
+    const calendarGrid = document.getElementById("calendar-grid");
+    const monthLabel = document.getElementById("month-label");
+    const monthlyRevenue = document.getElementById("monthly-revenue");
+    const monthlyCosts = document.getElementById("monthly-costs");
+    const monthlyProfit = document.getElementById("monthly-profit");
+    const selectedDateLabel = document.getElementById("selected-date-label");
+    const revenueInput = document.getElementById("daily-revenue");
+    const costsInput = document.getElementById("daily-costs");
+    const deleteDayButton = document.getElementById("delete-day");
+    const profitMessage = document.getElementById("profit-message");
+    const lastSavedDateKey = "grocery-calculator-last-saved-date-v1";
+    let profitEntries = {};
+    let lastSavedDate = null;
+
+    try {
+      const savedEntries = localStorage.getItem(profitStorageKey);
+      lastSavedDate = localStorage.getItem(lastSavedDateKey);
+      if (savedEntries) {
+        profitEntries = JSON.parse(savedEntries);
+        if (!profitEntries || typeof profitEntries !== "object" || Array.isArray(profitEntries)) {
+          throw new Error("Saved calendar data has an invalid format.");
+        }
+      }
+    } catch (error) {
+      profitEntries = {};
+      profitMessage.textContent = `Could not load saved calendar data: ${error.message}`;
+    }
+
+    const now = new Date();
+    let displayedMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    let selectedDate = makeDateKey(now.getFullYear(), now.getMonth(), now.getDate());
+    if (isValidDateKey(lastSavedDate)) {
+      selectedDate = lastSavedDate;
+      const [savedYear, savedMonth] = selectedDate.split("-").map(Number);
+      displayedMonth = new Date(savedYear, savedMonth - 1, 1);
+    }
+
+    function makeDateKey(year, monthIndex, day) {
+      return `${year}-${String(monthIndex + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    }
+
+    function isValidDateKey(value) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(value || "")) {
+        return false;
+      }
+      const [year, month, day] = value.split("-").map(Number);
+      const date = new Date(year, month - 1, day);
+      return date.getFullYear() === year
+        && date.getMonth() === month - 1
+        && date.getDate() === day;
+    }
+
+    function saveProfitEntries() {
+      try {
+        localStorage.setItem(profitStorageKey, JSON.stringify(profitEntries));
+        localStorage.setItem(lastSavedDateKey, selectedDate);
+        return true;
+      } catch (error) {
+        profitMessage.textContent = `Could not save calendar data: ${error.message}`;
+        return false;
+      }
+    }
+
+    function renderCalendar() {
+      const year = displayedMonth.getFullYear();
+      const monthIndex = displayedMonth.getMonth();
+      const monthKey = makeDateKey(year, monthIndex, 1).slice(0, 7);
+      const monthEntries = Object.entries(profitEntries)
+        .filter(([date]) => date.startsWith(`${monthKey}-`))
+        .map(([, entry]) => entry);
+      const totals = monthEntries.reduce((sum, entry) => {
+        sum.revenue += Number(entry.revenue);
+        sum.costs += Number(entry.costs);
+        return sum;
+      }, { revenue: 0, costs: 0 });
+
+      monthLabel.textContent = displayedMonth.toLocaleDateString(undefined, {
+        month: "long",
+        year: "numeric"
+      });
+      monthlyRevenue.textContent = formatMoney(totals.revenue);
+      monthlyCosts.textContent = formatMoney(totals.costs);
+      const profit = totals.revenue - totals.costs;
+      monthlyProfit.textContent = formatMoney(profit);
+      monthlyProfit.classList.toggle("profit-positive", profit > 0);
+      monthlyProfit.classList.toggle("profit-negative", profit < 0);
+
+      calendarGrid.replaceChildren();
+      const firstWeekday = new Date(year, monthIndex, 1).getDay();
+      const numberOfDays = new Date(year, monthIndex + 1, 0).getDate();
+
+      for (let i = 0; i < firstWeekday; i++) {
+        const blank = document.createElement("span");
+        blank.className = "calendar-blank";
+        blank.setAttribute("aria-hidden", "true");
+        calendarGrid.append(blank);
+      }
+
+      for (let day = 1; day <= numberOfDays; day++) {
+        const dateKey = makeDateKey(year, monthIndex, day);
+        const entry = profitEntries[dateKey];
+        const dayButton = document.createElement("button");
+        dayButton.type = "button";
+        dayButton.className = "calendar-day";
+        if (dateKey === selectedDate) {
+          dayButton.classList.add("selected");
+        }
+        if (dateKey === makeDateKey(now.getFullYear(), now.getMonth(), now.getDate())) {
+          dayButton.classList.add("today");
+        }
+
+        const dayNumber = document.createElement("span");
+        dayNumber.className = "day-number";
+        dayNumber.textContent = day;
+        dayButton.append(dayNumber);
+
+        if (entry) {
+          const dayProfit = Number(entry.revenue) - Number(entry.costs);
+          const profitText = document.createElement("span");
+          profitText.className = "day-profit";
+          if (dayProfit < 0) {
+            profitText.classList.add("profit-negative");
+          }
+          profitText.textContent = formatMoney(dayProfit);
+          dayButton.append(profitText);
+          dayButton.setAttribute("aria-label", `${dateKey}, profit ${formatMoney(dayProfit)}`);
+        } else {
+          dayButton.setAttribute("aria-label", dateKey);
+        }
+
+        dayButton.addEventListener("click", () => {
+          selectedDate = dateKey;
+          renderCalendar();
+          renderDayEditor();
+        });
+        calendarGrid.append(dayButton);
+      }
+
+      renderDayEditor();
+    }
+
+    function renderDayEditor() {
+      const entry = profitEntries[selectedDate];
+      const date = new Date(`${selectedDate}T00:00:00`);
+      selectedDateLabel.textContent = date.toLocaleDateString(undefined, {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        year: "numeric"
+      });
+      revenueInput.value = entry ? Number(entry.revenue).toFixed(2) : "";
+      costsInput.value = entry ? Number(entry.costs).toFixed(2) : "";
+      deleteDayButton.disabled = !entry;
+    }
+
+    document.getElementById("previous-month").addEventListener("click", () => {
+      displayedMonth = new Date(displayedMonth.getFullYear(), displayedMonth.getMonth() - 1, 1);
+      selectedDate = makeDateKey(displayedMonth.getFullYear(), displayedMonth.getMonth(), 1);
+      renderCalendar();
+    });
+
+    document.getElementById("next-month").addEventListener("click", () => {
+      displayedMonth = new Date(displayedMonth.getFullYear(), displayedMonth.getMonth() + 1, 1);
+      selectedDate = makeDateKey(displayedMonth.getFullYear(), displayedMonth.getMonth(), 1);
+      renderCalendar();
+    });
+
+    document.getElementById("daily-entry-form").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const revenue = Number(revenueInput.value);
+      const costs = Number(costsInput.value);
+      if (!Number.isFinite(revenue) || !Number.isFinite(costs) || revenue < 0 || costs < 0) {
+        profitMessage.textContent = "Enter valid non-negative amounts for revenue and costs.";
+        return;
+      }
+
+      profitEntries[selectedDate] = { revenue, costs };
+      if (saveProfitEntries()) {
+        profitMessage.textContent = `Saved. Daily profit: ${formatMoney(revenue - costs)}.`;
+      }
+      renderCalendar();
+    });
+
+    deleteDayButton.addEventListener("click", () => {
+      delete profitEntries[selectedDate];
+      if (saveProfitEntries()) {
+        profitMessage.textContent = "Daily entry deleted.";
+      }
+      renderCalendar();
+    });
+
+    renderCalendar();
+  </script>
+</body>
+</html>
